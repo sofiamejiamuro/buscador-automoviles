@@ -2,6 +2,7 @@
 const cars = autos;
 const result = document.querySelector('#resultado');
 const container = document.querySelector('#container');
+const amount = [20000, 25000, 30000, 35000, 40000, 45000, 50000, 55000, 60000, 65000, 70000, 75000, 80000];
 
 // Listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -14,12 +15,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Filtering
 const filter = (selectDOM) => {
+
+
     while (result.firstChild) {
         result.removeChild(result.firstChild);
     }
     const filterType = selectDOM.id;
     const selectedOption = selectDOM.value;
-    const filteredData = cars.filter(car => car[filterType] === selectedOption);
+    const filterData = [];
+
+    if (filterType === 'min') {
+        filteredData = cars.filter(car => car.precio > parseInt(selectedOption));
+    } else if (filterType === 'max') {
+        filteredData = cars.filter(car => car.precio < parseInt(selectedOption));
+    } else if (filterType === 'year' || filterType === 'puertas') {
+        filteredData = cars.filter(car => car[filterType] === parseInt(selectedOption));
+    } else {
+        filteredData = cars.filter(car => car[filterType] === selectedOption);
+    }
+
     filteredData.forEach(car => {
         const carInfo = document.createElement('p');
         carInfo.textContent = `marca: ${car.marca} - modelo: ${car.modelo} - color: ${car.color} - año: ${car.year} - precio: ${car.precio} - transmision: ${car.transmision} - puertas: ${car.puertas}`;
@@ -38,8 +52,10 @@ const showCars = (cars) => {
 };
 
 createSelects = (cars) => {
-    const getSpecs = cars[0];
     let specs = [];
+    let getSpecs = cars[0];
+    getSpecs['min'] = ""
+    getSpecs['max'] = ""
 
     for (let spec in getSpecs) {
         specs = [...specs, spec]
@@ -64,8 +80,16 @@ createSelects = (cars) => {
 };
 
 const createOptions = (cars, specs, selectDOM) => {
+
     specs.forEach(spec => {
-        if (selectDOM.id === spec) {
+        if (selectDOM.id === 'min' || selectDOM.id === 'max') {
+            amount.forEach((option) => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option;
+                optionElement.textContent = option;
+                selectDOM.appendChild(optionElement);
+            });
+        } else if (selectDOM.id === spec) {
             const options = new Set(cars.map(car => car[spec]));
             options.forEach((option) => {
                 const optionElement = document.createElement('option');
@@ -73,6 +97,7 @@ const createOptions = (cars, specs, selectDOM) => {
                 optionElement.textContent = option;
                 selectDOM.appendChild(optionElement);
             });
-        };
+        }
+
     });
 };
